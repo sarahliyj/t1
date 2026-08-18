@@ -30,39 +30,37 @@
       position: relative;
       font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       overflow: hidden;
-      /* remove any padding that might push content down */
       padding: 0;
     }
 
-    /* timer – adjusted top to reduce empty space above */
+    /* timer – adjusted spacing */
     .timer {
       position: absolute;
-      top: 30%;
+      top: 18%;
       left: 0;
       right: 0;
       text-align: center;
       font-size: 90px;
-      font-weight: 150;
+      font-weight: 200;
       letter-spacing: -1px;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
 
-    /* controls – moved closer to timer */
+    /* controls */
     .controls {
       position: absolute;
-      top: 50%;
+      top: 42%;
       left: 24px;
       right: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
     .btn {
-      width: 90px;
-      height: 90px;
-      border-radius: 60%;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -73,15 +71,26 @@
       font-family: inherit;
       cursor: pointer;
     }
-    .btn.start { background: rgba(48, 209, 88, 0.16); color: #30d158; }
-    .dots { display: flex; gap: 6px; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: #48484a; }
+    .btn.start {
+      background: rgba(48, 209, 88, 0.16);
+      color: #30d158;
+    }
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #48484a;
+    }
     .dot.active { background: #fff; }
 
-    /* lap list – adjusted top to keep it close to controls */
+    /* lap list */
     .laplist {
       position: absolute;
-      top: 62%;
+      top: 52%;
       left: 0;
       right: 0;
       border-top: 0.5px solid #38383a;
@@ -95,51 +104,44 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* bottom tab bar – fixed label visibility, iOS grey/orange style */
+    /* bottom tab bar – using your image */
     .tabbar {
       position: absolute;
       bottom: 16px;
       left: 0;
       right: 0;
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      align-items: center;
       padding: 0 10px;
     }
-    .tab {
+    .tabbar img {
+      width: 100%;
+      max-width: 380px;   /* adjust to match your image's natural look */
+      height: auto;
+      display: block;
+    }
+
+    /* gear button (to open settings) */
+    .gear-btn {
+      position: absolute;
+      top: 44px;
+      right: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      font-size: 16px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 4px;
-      color: #8e8e93;
-      font-size: 24px;
-      transition: color 0.1s;
-      cursor: default;
-    }
-    .tab.active span:first-child {
-  /* 将图标转为橙色 (#ff9f0a) 的滤镜组合 */
-      filter: brightness(0) saturate(100%) invert(58%) sepia(98%) saturate(1627%) hue-rotate(1deg) brightness(102%) contrast(104%);
+      justify-content: center;
+      z-index: 20;
+      cursor: pointer;
     }
 
-    /* make the icon grey by default, orange when active */
-    .tab span:first-child {
-      display: block;
-      filter: grayscale(100%) brightness(0.7);
-      transition: filter 0.1s, color 0.1s;
-    }
-    .tab.active span:first-child {
-      filter: none;
-      color: #ff9f0a;
-    }
-
-    /* label – explicitly visible, inherits color from parent */
-    .tab .label {
-      font-size: 10px;
-      letter-spacing: 0.1px;
-      display: block;
-      color: inherit;  /* grey or orange */
-    }
-
-    /* settings panel – unchanged, triggered by World Clock */
+    /* settings panel – unchanged */
     .panel-backdrop {
       position: absolute;
       inset: 0;
@@ -208,15 +210,15 @@
     </div>
   </div>
 
-  <!-- bottom tab bar – labels are now visible again -->
+  <!-- bottom tab bar – using your image -->
   <div class="tabbar">
-    <div class="tab" id="worldClockTab"><span>🌐</span><span class="label">World Clock</span></div>
-    <div class="tab"><span>⏰</span><span class="label">Alarms</span></div>
-    <div class="tab active"><span>⏱️</span><span class="label">Stopwatch</span></div>
-    <div class="tab"><span>⏲️</span><span class="label">Timers</span></div>
+    <img src="IMG_7198.jpg" alt="Tab bar">
   </div>
 
-  <!-- Settings panel – triggered by clicking "World Clock" -->
+  <!-- gear button to open settings panel -->
+  <button class="gear-btn" id="gearBtn">⚙️</button>
+
+  <!-- Settings panel -->
   <div class="panel-backdrop" id="panelBackdrop">
     <div class="panel">
       <h3>起始时间 / 倍速设置</h3>
@@ -261,6 +263,7 @@
 </div>
 
 <script>
+  // ─── Stopwatch logic ───
   let startMs = (3 * 3600 + 50 * 60) * 1000;
   let endMs = null;
   let speed = 3;
@@ -302,18 +305,15 @@
     rafId = requestAnimationFrame(tick);
   }
 
-  // --- Panel wiring ---
+  // ─── Panel wiring ───
   const panelBackdrop = document.getElementById('panelBackdrop');
+  const gearBtn = document.getElementById('gearBtn');
   const closeBtn = document.getElementById('closeBtn');
   const applyBtn = document.getElementById('applyBtn');
   const useEndCheckbox = document.getElementById('useEnd');
   const endRow = document.getElementById('endRow');
 
-  // Click "World Clock" to toggle panel
-  document.getElementById('worldClockTab').addEventListener('click', function(e) {
-    panelBackdrop.classList.toggle('open');
-  });
-
+  gearBtn.addEventListener('click', () => panelBackdrop.classList.add('open'));
   closeBtn.addEventListener('click', () => panelBackdrop.classList.remove('open'));
   panelBackdrop.addEventListener('click', (e) => {
     if (e.target === panelBackdrop) panelBackdrop.classList.remove('open');
@@ -355,7 +355,7 @@
     }
   });
 
-  // Auto-start
+  // ─── Auto‑start ───
   startAnimation();
 </script>
 </body>
