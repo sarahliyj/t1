@@ -30,13 +30,16 @@
       position: relative;
       font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       overflow: hidden;
+      /* remove any padding that might push content down */
+      padding: 0;
     }
 
-    /* timer – extra space above */
+    /* timer – adjusted top to reduce empty space above */
     .timer {
       position: absolute;
-      top: 24.5%;
-      left: 0; right: 0;
+      top: 18%;
+      left: 0;
+      right: 0;
       text-align: center;
       font-size: 90px;
       font-weight: 200;
@@ -45,51 +48,76 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* controls */
+    /* controls – moved closer to timer */
     .controls {
       position: absolute;
-      top: 47.4%;
-      left: 24px; right: 24px;
+      top: 42%;
+      left: 24px;
+      right: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .btn {
-      width: 78px; height: 78px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px; background: rgba(255,255,255,0.14); color: #fff;
-      border: none; font-family: inherit;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border: none;
+      font-family: inherit;
       cursor: pointer;
     }
-    .btn.start { background: rgba(48,209,88,0.16); color: #30d158; }
+    .btn.start { background: rgba(48, 209, 88, 0.16); color: #30d158; }
     .dots { display: flex; gap: 6px; }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: #48484a; }
     .dot.active { background: #fff; }
 
-    /* lap list */
+    /* lap list – adjusted top to keep it close to controls */
     .laplist {
-      position: absolute; top: 56.6%; left: 0; right: 0;
+      position: absolute;
+      top: 52%;
+      left: 0;
+      right: 0;
       border-top: 0.5px solid #38383a;
     }
     .laprow {
-      display: flex; justify-content: space-between; padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 24px;
       border-bottom: 0.5px solid #38383a;
-      font-size: 17px; font-variant-numeric: tabular-nums;
+      font-size: 17px;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* bottom tab bar – grey icons + text, orange when active */
+    /* bottom tab bar – fixed label visibility, iOS grey/orange style */
     .tabbar {
-      position: absolute; bottom: 16px; left: 0; right: 0;
-      display: flex; justify-content: space-around; padding: 0 10px;
+      position: absolute;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 10px;
     }
     .tab {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
       color: #8e8e93;
       font-size: 24px;
       transition: color 0.1s;
       cursor: default;
     }
     .tab.active { color: #ff9f0a; }
+
+    /* make the icon grey by default, orange when active */
     .tab span:first-child {
       display: block;
       filter: grayscale(100%) brightness(0.7);
@@ -99,17 +127,20 @@
       filter: none;
       color: #ff9f0a;
     }
+
+    /* label – explicitly visible, inherits color from parent */
     .tab .label {
-      font-size: 10px; letter-spacing: 0.1px;
+      font-size: 10px;
+      letter-spacing: 0.1px;
       display: block;
-      color: inherit;
+      color: inherit;  /* grey or orange */
     }
 
-    /* settings panel */
+    /* settings panel – unchanged, triggered by World Clock */
     .panel-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0, 0, 0, 0.55);
       z-index: 30;
       display: none;
       align-items: flex-end;
@@ -174,7 +205,7 @@
     </div>
   </div>
 
-  <!-- bottom tab bar: clicking "World Clock" opens the settings panel -->
+  <!-- bottom tab bar – labels are now visible again -->
   <div class="tabbar">
     <div class="tab" id="worldClockTab"><span>🌐</span><span class="label">World Clock</span></div>
     <div class="tab"><span>⏰</span><span class="label">Alarms</span></div>
@@ -182,7 +213,7 @@
     <div class="tab"><span>⏲️</span><span class="label">Timers</span></div>
   </div>
 
-  <!-- Settings panel (triggered by clicking "World Clock") -->
+  <!-- Settings panel – triggered by clicking "World Clock" -->
   <div class="panel-backdrop" id="panelBackdrop">
     <div class="panel">
       <h3>起始时间 / 倍速设置</h3>
@@ -227,7 +258,7 @@
 </div>
 
 <script>
-  let startMs = (3*3600 + 50*60) * 1000;
+  let startMs = (3 * 3600 + 50 * 60) * 1000;
   let endMs = null;
   let speed = 3;
   let startTime = null;
@@ -241,7 +272,7 @@
     let totalMin = Math.floor(totalSec / 60);
     let m = totalMin % 60;
     let h = Math.floor(totalMin / 60);
-    return h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0') + '.' + String(cs).padStart(2,'0');
+    return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + String(cs).padStart(2, '0');
   }
 
   function tick(now) {
@@ -268,35 +299,32 @@
     rafId = requestAnimationFrame(tick);
   }
 
-  // --- Settings panel wiring ---
+  // --- Panel wiring ---
   const panelBackdrop = document.getElementById('panelBackdrop');
   const closeBtn = document.getElementById('closeBtn');
   const applyBtn = document.getElementById('applyBtn');
   const useEndCheckbox = document.getElementById('useEnd');
   const endRow = document.getElementById('endRow');
 
-  // Click "World Clock" to toggle the settings panel open/close
+  // Click "World Clock" to toggle panel
   document.getElementById('worldClockTab').addEventListener('click', function(e) {
     panelBackdrop.classList.toggle('open');
   });
 
-  // Close panel via backdrop click or close button
   closeBtn.addEventListener('click', () => panelBackdrop.classList.remove('open'));
   panelBackdrop.addEventListener('click', (e) => {
     if (e.target === panelBackdrop) panelBackdrop.classList.remove('open');
   });
 
-  // Toggle end time row visibility
   useEndCheckbox.addEventListener('change', () => {
     endRow.style.display = useEndCheckbox.checked ? 'flex' : 'none';
   });
 
-  // Apply settings and restart timer
   applyBtn.addEventListener('click', () => {
     const sh = parseInt(document.getElementById('startH').value) || 0;
     const sm = parseInt(document.getElementById('startM').value) || 0;
     const ss = parseInt(document.getElementById('startS').value) || 0;
-    startMs = (sh*3600 + sm*60 + ss) * 1000;
+    startMs = (sh * 3600 + sm * 60 + ss) * 1000;
 
     speed = parseFloat(document.getElementById('speedInput').value) || 1;
 
@@ -304,7 +332,7 @@
       const eh = parseInt(document.getElementById('endH').value) || 0;
       const em = parseInt(document.getElementById('endM').value) || 0;
       const es = parseInt(document.getElementById('endS').value) || 0;
-      endMs = (eh*3600 + em*60 + es) * 1000;
+      endMs = (eh * 3600 + em * 60 + es) * 1000;
     } else {
       endMs = null;
     }
@@ -313,10 +341,8 @@
     startAnimation();
   });
 
-  // Reset button
   document.getElementById('resetBtn').addEventListener('click', startAnimation);
 
-  // Start/Stop toggle
   document.getElementById('startbtn').addEventListener('click', function() {
     if (this.textContent === 'Stop') {
       if (rafId) cancelAnimationFrame(rafId);
@@ -326,7 +352,7 @@
     }
   });
 
-  // Auto-start on load
+  // Auto-start
   startAnimation();
 </script>
 </body>
