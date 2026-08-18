@@ -115,7 +115,10 @@
       transition: color 0.1s;
       cursor: default;
     }
-    .tab.active { color: #ff9f0a; }
+    .tab.active span:first-child {
+  /* 将图标转为橙色 (#ff9f0a) 的滤镜组合 */
+      filter: brightness(0) saturate(100%) invert(58%) sepia(98%) saturate(1627%) hue-rotate(1deg) brightness(102%) contrast(104%);
+    }
 
     /* make the icon grey by default, orange when active */
     .tab span:first-child {
